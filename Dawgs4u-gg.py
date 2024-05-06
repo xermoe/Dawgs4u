@@ -6,9 +6,24 @@
 
 import webbrowser
 
-print("Hello! This is a python code that asks a series of questions to determine the best Dawg for you!")
-print("Please answer each question honestly and to the best of your knowledge")
+def choose_language(): #COMPLEX FEATURE 1
+    while True:
+        print("Choose your preferred language:")
+        print("1 - English")
+        print("2 - Spanish")
+        choice = input("Enter the number corresponding to your choice: ")
+        if choice == "1":
+            return "English"
+        elif choice == "2":
+            return "Spanish"
+        else:
+            print("Invalid choice, please enter 1 or 2.")
 
+
+print("Hello! This is a python code that asks a series of questions to determine the best Dawg for you!")
+print("Hola! Este es un código Python que hace una serie de preguntas para determinar cuál es el mejor perro para ti.")
+print("Please answer each question honestly and to the best of your knowledge")
+print("Por favor responda cada pregunta honestamente y lo mejor que pueda")
 class Dog:
     def __init__(self, breed, answers, summary):
         self.breed = breed
@@ -16,8 +31,9 @@ class Dog:
         self.summary = summary
 
 dog_shelters = "https://www.pawschicago.org"
+
 # Preassigned answers, summaries for each dog breed
-dog_breeds = {
+dog_breeds = { #feature 1
     "Labrador Retriever": {
         "answers": [5, 4, 3, 2, 1, 5, 4, 3, 2, 1, 5, 4, 3, 2, 1, 5, 4, 3, 2, 1, 5, 4, 3, 2, 1],
         "summary": "Labradors are friendly, outgoing, and good-natured dogs. They are known for their loyalty and love for family."
@@ -104,7 +120,7 @@ dog_breeds = {
 dogs = [Dog(breed, data["answers"], data["summary"]) for breed, data in dog_breeds.items()]
 
 # 25 listed questions
-questions = [
+questions_en = [
     "I prefer to stay indoors rather than go outdoors.",
     "I enjoy relaxing more than being active.",
     "I am not fond of spending time outdoors.",
@@ -127,29 +143,57 @@ questions = [
     "I do not enjoy cuddling.",
     "I am not curious by nature.",
     "I do not enjoy playing.",
-    "I do not have a strong prey drive.",
-    "I dislike being groomed.",
+    "I do not like hunting",
+    "I dislike being clean.",
     "I am not territorial."
 ]
+questions_es = [
+    "Prefiero quedarme en casa que salir afuera.",
+    "Disfruto más relajándome que estando activo.",
+    "No soy aficionado a pasar tiempo al aire libre",
+    "No me siento cómodo conociendo gente nueva.",
+    "Prefiero estar solo que con otros.",
+    "No me gusta la actividad física.",
+    "Prefiero un ambiente tranquilo a uno animado.",
+    "No hablo.",
+    "Me resulta difícil adaptarme a nuevas situaciones.",
+    "La lealtad no es importante para mí.",
+    "No me gusta entrenar y aprender cosas nuevas.",
+    "Prefiero tener un círculo social pequeño.",
+    "No soy protector de mis seres queridos",
+    "Me cuesta manejar el estrés.",
+    "No me gusta ser el centro de atención.",
+    "Evito tomar riesgos o ser aventurero",
+    "Prefiero seguir una rutina que ser espontáneo.",
+    "No soy terco.",
+    "Me siento incómodo con extraños",
+    "No me gustan los abrazos.",
+    "No soy curioso por naturaleza",
+    "No disfruto jugando.",
+    "No me gusta cazar",
+    "No me gusta estar limpio",
+    "No soy territorial."
+]
 
-def get_user_answers():
+def get_user_answers(language):
     user_answers = []
     print("Please answer the following questions on a scale of highly disagree (1) to highly agree (5):")
+    print("Responda las siguientes preguntas en una escala de muy en desacuerdo (1) a muy de acuerdo (5):")
+    questions = questions_en if language =="English" else questions_es
     for i, question in enumerate(questions, start=1):
-        while True:
+       while True:
             try:
                 answer = int(input(f"{i}. {question}: "))
                 if 1 <= answer <= 5:
                     break
                 else:
-                    print("Please enter a number between 1 and 5.")
+                    print("Please enter a number between 1 and 5.") #feature 2
             except ValueError:
                 print("Invalid input. Please enter a number between 1 and 5.")
-        user_answers.append(answer)
+            user_answers.append(answer)
     return user_answers
 
-
-def calculate_similarity(user_answers, dog):
+def calculate_similarity(user_answers, dog):#feature 3
     total_difference = sum(abs(user_ans - dog_ans) for user_ans, dog_ans in zip(user_answers, dog.answers))
     return total_difference
 
@@ -163,23 +207,42 @@ def recommend_dog(user_answers):
             recommended_dog = dog
     return recommended_dog
 
-def main():
-    user_answers = get_user_answers()
+def main():#COMPLEX FEATURE 2
+    language = choose_language()
+    user_answers = get_user_answers(language)
     recommended_dog = recommend_dog(user_answers)
-    print(f"I recommend a {recommended_dog.breed} for you!")
-    print("Here's a short summary of the recommended dog breed:")
+    
+    language_text = {
+        "English": {
+            "recommendation": f"I recommend a {recommended_dog.breed} for you!",
+            "summary": "Here's a short summary of the recommended dog breed:",
+            "action": "If you are looking to adopt, consider the website below:",
+            "open_link": "Would you like to open the link in your browser? (yes/no)",
+        },
+        "Spanish": {
+            "recommendation": f"Recomendamos un {recommended_dog.breed} para ti!",
+            "summary": "Aqui tienes un resumen breve de la raza de perro recomendada:",
+            "action": "Si quieres adoptar, puedes usar el sitio abajo:",
+            "open_link": "¿Le gustaría abrir el enlace en su navegador? (si(yes)/no)"
+        }
+    }
+    
+    print(language_text[language]["recommendation"])
+    print(language_text[language]["summary"])
     print(recommended_dog.summary)
-    print("If you are looking to adopt, consider the website below")
+    print(language_text[language]["action"])
     print(dog_shelters)
-    print("Would you like to open the link in your browser? (yes/no)")
+
+    print(language_text[language]["open_link"])#feature 4
     choice = input().lower()
     if choice == "yes":
         webbrowser.open(dog_shelters)
-
+        
 if __name__ == "__main__":
     main()
 
-
+#below was a first trial that had a completely different path. Ultimately didn't work but kept for 
+#knowledge and research purposes. Feel free to examine.
 """""
 print("Hello! The goal of this code is to use a series of questions to determine how compatible" + 
       "\nyou are with certain dog breeds. Afterwards, you will be given a recommended dog breed" + 
